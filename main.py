@@ -39,7 +39,7 @@ def make_shadow(img, blur_radius=24):
     # create new blank rgba img
     shadow = Image.new('RGBA', img.size, (0,0,0,0))
     shadow.paste(img, mask=mask)
-    shadow = shadow.filter(ImageFilter.BoxBlur(radius=blur_radius))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(radius=blur_radius))
     shadow.save("output/temp/shadow.png")
     return shadow
 
