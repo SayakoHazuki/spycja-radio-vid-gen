@@ -4,3 +4,4 @@ assets/thumbnail.*
 assets/**/*
 frame.png
 lyrics.txt
+config.txt
