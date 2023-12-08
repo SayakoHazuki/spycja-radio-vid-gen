@@ -1,5 +1,6 @@
 output/
 assets/background.*
 assets/thumbnail.*
+assets/**/*
 frame.png
 lyrics.txt
