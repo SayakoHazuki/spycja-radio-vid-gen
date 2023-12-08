@@ -10,12 +10,29 @@ from PIL import Image, ImageFilter, ImageOps
 print("All imports loaded.")
   
 # Config
-BACKGROUND_IMAGE = "assets/background.jpg"
-THUMBNAIL_IMAGE = "assets/thumbnail.jfif"
-SONG_TITLE = "さよならプリンセス"
-SONG_ARTIST = "初音ミク"
-POST_AUTHOR = "匿名"
-MODE = "DEBUG" # "DEBUG", "PREVIEW" or "RELEASE"
+
+with open ("config.txt", "r", encoding="utf-8") as f:
+    config = f.read().split("\n")
+    config = [item.strip() for item in config]
+    config = [item.split(" = ") for item in config]
+    config = {item[0]: item[1].strip("\"") for item in config}
+
+BACKGROUND_IMAGE = input("Background image path: (default: " + config["BACKGROUND_IMAGE"] + ") ") or config["BACKGROUND_IMAGE"]
+THUMBNAIL_IMAGE =   input("Thumbnail image path: (default: " + config["THUMBNAIL_IMAGE"] + ") ") or config["THUMBNAIL_IMAGE"]
+SONG_TITLE =    input("Song title: (default: " + config["SONG_TITLE"] + ") ") or config["SONG_TITLE"]
+SONG_ARTIST =   input("Song artist: (default: " + config["SONG_ARTIST"] + ") ") or config["SONG_ARTIST"]
+POST_AUTHOR =   input("Post author: (default: " + config["POST_AUTHOR"] + ") ") or config["POST_AUTHOR"]
+MODE = "PREVIEW" # "DEBUG", "PREVIEW" or "RELEASE"
+
+with open ("config.txt", "w", encoding="utf-8") as f:
+    f.write(f"BACKGROUND_IMAGE = \"{BACKGROUND_IMAGE}\"\n")
+    f.write(f"THUMBNAIL_IMAGE = \"{THUMBNAIL_IMAGE}\"\n")
+    f.write(f"SONG_TITLE = \"{SONG_TITLE}\"\n")
+    f.write(f"SONG_ARTIST = \"{SONG_ARTIST}\"\n")
+    f.write(f"POST_AUTHOR = \"{POST_AUTHOR}\"\n")
+    f.write(f"MODE = \"{MODE}\"\n")
+
+
 
 # Constants
 LOGO_IMAGE = "assets/logo.png"
@@ -43,11 +60,23 @@ def make_shadow(img, blur_radius=24):
     shadow.save("output/temp/shadow.png")
     return shadow
 
+def fade_pos_fn(clip_length, normal_pos, fade_length=1.5, fade_magnitude=0.02):
+    [x, y] = normal_pos
+    fl = fade_length
+    l = clip_length - 2 * fl
+    m = fade_magnitude
+    # Math equation:
+    # y = h ( -m(x - fl)^2 + 1 ) {0 <= x <= fl}
+    # y = h ( m(x - l - fl)^2 + 1 ) {l + fl <= x <= l + 2 * fl}
+    return lambda t: (x , y * (-m * (t - fl) ** 2 + 1 if t < fl else m * (t - l - fl) ** 2 + 1 if t > l + fl else 1))
+
 def TextShadowClip(clip: mpy.TextClip, blur_radius=24):
     frameImg = Image.fromarray(clip.get_frame(0))
     
     clip = mpy.ImageClip(np.array(make_shadow(frameImg, blur_radius))) \
-        .set_position(clip.pos).set_duration(clip.duration).set_start(clip.start).set_end(clip.end)
+        .set_position(clip.pos).set_duration(clip.duration).set_start(clip.start).set_end(clip.end) \
+        .set_position(fade_pos_fn(clip.duration, clip.pos(1.6))) \
+        .crossfadein(.8).crossfadeout(.8)
     return clip
 
 def prioritizeImageSize(path, target_width, target_height):
@@ -146,12 +175,19 @@ for i in range(len(data)):
         
     lyricsChClip = mpy.TextClip(chLyric, fontsize=56, color='white', font=NOTO_SANS_FONT) \
         .set_position(("center", 987)).set_duration(duration).set_start(timestamp).set_end(timestamp + duration)
-        
+    
+    
     allLyricsClips.append(TextShadowClip(lyricsJaClip, 32/5))
-    allLyricsClips.append(lyricsJaClip)
     allLyricsClips.append(TextShadowClip(lyricsRoClip, 24/5))
-    allLyricsClips.append(lyricsRoClip)
     allLyricsClips.append(TextShadowClip(lyricsChClip, 28/5))
+    
+    [lyricsJaClip, lyricsRoClip, lyricsChClip] = [
+        clip.set_position(fade_pos_fn(clip.duration, clip.pos(1.6))) \
+            .crossfadein(.8).crossfadeout(.8) for clip in [lyricsJaClip, lyricsRoClip, lyricsChClip]
+    ]
+    
+    allLyricsClips.append(lyricsJaClip)
+    allLyricsClips.append(lyricsRoClip)
     allLyricsClips.append(lyricsChClip)
     
     print(f"{i + 1} of {len(data)} done", end=(" \r" if i < len(data) - 1 else " \n"))
@@ -177,7 +213,7 @@ if MODE == "PREVIEW":
     
     print("[PREVIEW] Exporting preview")
     filename = f"./output/temp/{datetime.datetime.now().timestamp()}.mp4"
-    final.subclip(data[4][0] - 3, data[5][0] + 3).write_videofile(filename, fps=24, codec="libx264")
+    final.subclip(0, data[3][0] + 5).write_videofile(filename, fps=12, codec="libx264")
     abspath = os.path.abspath(filename)
     os.startfile(abspath)
 
