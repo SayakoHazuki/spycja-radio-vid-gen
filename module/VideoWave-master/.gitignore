@@ -1,0 +1,13 @@
+# Auto-generated
+__pychache__/
+*.egg-info/
+
+# Compiled files
+*.exe
+*.o
+*.pyc
+
+# Media Files
+*.mp4
+*.mov
+*.avi

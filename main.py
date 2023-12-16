@@ -16,21 +16,29 @@ with open ("config.txt", "r", encoding="utf-8") as f:
     config = [item.strip() for item in config]
     config = [item.split(" = ") for item in config]
     config = {item[0]: item[1].strip("\"") for item in config}
+config["LENGTH"] = float(config["LENGTH"])
+config["LYRIC_START"] = float(config["LYRIC_START"])
 
 BACKGROUND_IMAGE = input("Background image path: (default: " + config["BACKGROUND_IMAGE"] + ") ") or config["BACKGROUND_IMAGE"]
 THUMBNAIL_IMAGE =   input("Thumbnail image path: (default: " + config["THUMBNAIL_IMAGE"] + ") ") or config["THUMBNAIL_IMAGE"]
+AUDIO_FILE =    input("Audio file path: (default: " + config["AUDIO_FILE"] + ") ") or config["AUDIO_FILE"]
 SONG_TITLE =    input("Song title: (default: " + config["SONG_TITLE"] + ") ") or config["SONG_TITLE"]
 SONG_ARTIST =   input("Song artist: (default: " + config["SONG_ARTIST"] + ") ") or config["SONG_ARTIST"]
 POST_AUTHOR =   input("Post author: (default: " + config["POST_AUTHOR"] + ") ") or config["POST_AUTHOR"]
-MODE = "PREVIEW" # "DEBUG", "PREVIEW" or "RELEASE"
+LENGTH =  input("Length: (default: " + str(config["LENGTH"]) + ") ") or config["LENGTH"]
+LYRIC_START = input("Lyric start: (default: " + str(config["LYRIC_START"]) + ") ") or config["LYRIC_START"]
+MODE =input("Mode: (default: " + config["MODE"] + ") ") or config["MODE"]
 
 with open ("config.txt", "w", encoding="utf-8") as f:
     f.write(f"BACKGROUND_IMAGE = \"{BACKGROUND_IMAGE}\"\n")
     f.write(f"THUMBNAIL_IMAGE = \"{THUMBNAIL_IMAGE}\"\n")
+    f.write(f"AUDIO_FILE = \"{AUDIO_FILE}\"\n")
     f.write(f"SONG_TITLE = \"{SONG_TITLE}\"\n")
     f.write(f"SONG_ARTIST = \"{SONG_ARTIST}\"\n")
     f.write(f"POST_AUTHOR = \"{POST_AUTHOR}\"\n")
-    f.write(f"MODE = \"{MODE}\"\n")
+    f.write(f"LENGTH = {LENGTH}\n")
+    f.write(f"LYRIC_START = {LYRIC_START}\n")
+    f.write(f"MODE = \"{MODE}\"")
 
 
 
@@ -144,6 +152,10 @@ print("Creating postAuthorClip")
 postAuthorClip = mpy.TextClip(f"投稿: {POST_AUTHOR}", fontsize=36, color='white', font=NOTO_SANS_FONT)
 postAuthorClip = postAuthorClip.set_position((229, 1792))
 
+print("Creating audio")
+musicClip = mpy.AudioFileClip(AUDIO_FILE)
+backgroundClip = backgroundClip.set_audio(musicClip)
+
 
 with open('output/time_record.txt', 'r', encoding='utf-8') as f:
     lyrics = f.read().split("\n\n")
@@ -158,8 +170,11 @@ with open('output/time_record.txt', 'r', encoding='utf-8') as f:
     
 print("Creating lyricsClips")
 allLyricsClips = []
+
+# breakpoint()
 for i in range(len(data)):
     timestamp, lyrics = data[i]
+    timestamp = timestamp + LYRIC_START - data[1][0]
     if i < len(data) - 1:
         duration = data[i+1][0] - timestamp
     else:
@@ -220,6 +235,6 @@ if MODE == "PREVIEW":
 if MODE == "RELEASE":
     print("[RELEASE] Exporting")
     filename = f"./output/{SONG_TITLE}_{datetime.datetime.now().timestamp()}.mp4"
-    final.subclip(0, data[-1][0] + 20).write_videofile(filename, fps=60, codec="libx264")
+    final.subclip(0, LENGTH).write_videofile(filename, fps=30, codec="libx264")
     abspath = os.path.abspath(filename)
     os.startfile(abspath)
