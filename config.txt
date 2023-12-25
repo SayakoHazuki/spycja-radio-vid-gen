@@ -1,9 +1,9 @@
-BACKGROUND_IMAGE = "c:\Code\spycja-radio-vid-gen\assets\20231209\b2.photo-1600695896538-c626efaa5b69.png"
-THUMBNAIL_IMAGE = "c:\Code\spycja-radio-vid-gen\assets\20231209\t.maxresdefault.jpg"
-AUDIO_FILE = "c:\Code\spycja-radio-vid-gen\assets\20231209\untitled.mp3"
+BACKGROUND_IMAGE = "C:\Users\Sayako\Code\SPYC\spycja-radio-vid-gen\assets\20231209\b2.photo-1600695896538-c626efaa5b69.png"
+THUMBNAIL_IMAGE = "C:\Users\Sayako\Code\SPYC\spycja-radio-vid-gen\assets\20231209\t.maxresdefault.jpg"
+AUDIO_FILE = "C:\Users\Sayako\Code\SPYC\spycja-radio-vid-gen\assets\20231209\untitled.mp3"
 SONG_TITLE = "ガーデン"
 SONG_ARTIST = "藤井風"
 POST_AUTHOR = "もも"
 LENGTH = 229.0
 LYRIC_START = 14.275
-MODE = "DEBUG"
+MODE = "PREVIEW"

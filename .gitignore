@@ -1,7 +1,10 @@
-output/
+output/*
 assets/background.*
 assets/thumbnail.*
-assets/**/*
+assets/*/*
 frame.png
 lyrics.txt
 config.txt
+*TEMP_MPY*
+module/*/*
+module/*/

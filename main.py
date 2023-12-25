@@ -45,7 +45,8 @@ with open ("config.txt", "w", encoding="utf-8") as f:
 # Constants
 LOGO_IMAGE = "assets/logo.png"
 MAKINAS_FONT = "Makinas-4-Flat"
-NOTO_SANS_FONT = "Noto-Sans-JP"
+NOTO_SANS_FONT_L = "Noto-Sans-JP-Light"
+NOTO_SANS_FONT_M = "Noto-Sans-JP-Medium"
 NOTO_SERIF_FONT = "Noto-Serif-HK"
 ZEN_OLD_MINCHO_FONT = "Zen-Old-Mincho-Regular"
 
@@ -149,7 +150,7 @@ artistClip = mpy.TextClip(SONG_ARTIST, fontsize=36, color='white', font=MAKINAS_
 artistClip = artistClip.set_position((229, 1748))
 
 print("Creating postAuthorClip")
-postAuthorClip = mpy.TextClip(f"投稿: {POST_AUTHOR}", fontsize=36, color='white', font=NOTO_SANS_FONT)
+postAuthorClip = mpy.TextClip(f"投稿: {POST_AUTHOR}", fontsize=36, color='white', font=NOTO_SANS_FONT_M)
 postAuthorClip = postAuthorClip.set_position((229, 1792))
 
 print("Creating audio")
@@ -185,10 +186,10 @@ for i in range(len(data)):
     lyricsJaClip = mpy.TextClip(jaLyric, fontsize=64, color='white', font=ZEN_OLD_MINCHO_FONT) \
         .set_position(("center",900)).set_duration(duration).set_start(timestamp).set_end(timestamp + duration)
     
-    lyricsRoClip = mpy.TextClip(roLyric, fontsize=48, color='white', font=NOTO_SANS_FONT) \
+    lyricsRoClip = mpy.TextClip(roLyric, fontsize=42, color='white', font=NOTO_SANS_FONT_M) \
         .set_position(("center", 852)).set_duration(duration).set_start(timestamp).set_end(timestamp + duration)
         
-    lyricsChClip = mpy.TextClip(chLyric, fontsize=56, color='white', font=NOTO_SANS_FONT) \
+    lyricsChClip = mpy.TextClip(chLyric, fontsize=56, color='white', font=NOTO_SANS_FONT_L) \
         .set_position(("center", 987)).set_duration(duration).set_start(timestamp).set_end(timestamp + duration)
     
     
